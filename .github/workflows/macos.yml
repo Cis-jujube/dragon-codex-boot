@@ -19,3 +19,5 @@ jobs:
         run: swift test --package-path macos
       - name: Build and verify macOS app bundle
         run: ./scripts/test-macos.sh
+      - name: Build and verify standalone Apple Silicon app and package
+        run: ./scripts/test-macos-standalone.sh

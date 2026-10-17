@@ -10,6 +10,8 @@
 
 macOS 的淡出会揭示 Codex 当前窗口；它不复刻 Windows 版依靠 DWM 缩略图把真实窗口嵌进动画屏幕的效果。Windows 版的 WPF、DWM 和快捷方式集成仍由下文原有实现负责。
 
+独立轻量版（PR #3）位于 `src/macos/`，适用于 Apple Silicon / macOS 13+：自适应16:9窗口、原音轨、Esc / Command+. / 按钮跳过，不安装监视器、不读取用户配置。使用 `./scripts/build-macos-standalone.sh` 构建，`./scripts/package-macos.sh` 打包；详情见 [独立轻量版说明](docs/MACOS-STANDALONE.md)。两套实现的构建入口和输出目录相互独立。
+
 ## Windows 版功能
 
 1. 居中播放启动视频，默认窗口为 **1920 × 1080 物理像素**。

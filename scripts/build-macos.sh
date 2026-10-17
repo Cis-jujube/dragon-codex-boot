@@ -5,9 +5,16 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 build_root="$repo_root/build/macos"
 app_bundle="$repo_root/build/DragonCodexBoot.app"
 
+if [[ "$(uname -s)" != Darwin ]]; then
+  printf 'This build requires macOS and Xcode Command Line Tools.\n' >&2
+  exit 1
+fi
+architecture="$(uname -m)"
 mkdir -p "$build_root"
 swiftc \
   -O \
+  -target "$architecture-apple-macosx13.0" \
+  -module-cache-path "$build_root/module-cache" \
   -parse-as-library \
   -module-name DragonCodexBootMac \
   -framework AppKit \
@@ -24,6 +31,7 @@ mkdir -p \
 cp "$build_root/DragonCodexBootMac" "$app_bundle/Contents/MacOS/DragonCodexBootMac"
 cp "$repo_root/config/launcher.macos.example.json" "$app_bundle/Contents/Resources/launcher.macos.example.json"
 cp "$repo_root/media/MEDIA_NOTICE.md" "$app_bundle/Contents/Resources/MEDIA_NOTICE.md"
+cp "$repo_root/LICENSE" "$repo_root/THIRD_PARTY_NOTICES.md" "$app_bundle/Contents/Resources/"
 
 if [[ -f "$repo_root/media/startup.mp4" ]]; then
   mkdir -p "$app_bundle/Contents/Resources/media"

@@ -56,3 +56,7 @@ macOS 版是 `macos/` 下的 Swift 原生启动器，要求 macOS 13 或更新�
 ```
 
 该脚本检查 Swift 编译、配置校验、淡出曲线、App 与登录监视器清单、本机签名及随包媒体。它不注册登录监视器、不启动 Codex，也不验证窗口匹配和焦点交接；这些行为需要在安装了 Codex 的 macOS 桌面上手动确认。完整 Xcode 环境下也可运行 `swift test --package-path macos` 执行单元测试。
+
+## 独立轻量版
+
+PR #3 的独立实现保留于 `src/macos/`，不安装 LaunchAgent、不读取 `launcher.json`，使用单独的 `build-macos-standalone.sh` / `test-macos-standalone.sh`。打包入口为 `package-macos.sh`。输出 `build/macos/Dragon Codex Boot.app`，不会覆盖本页的 `build/DragonCodexBoot.app`。见 [独立版说明](MACOS-STANDALONE.md)。

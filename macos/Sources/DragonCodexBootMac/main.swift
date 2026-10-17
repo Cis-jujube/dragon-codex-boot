@@ -7,6 +7,20 @@ import Foundation
 import DragonCodexBootCore
 #endif
 
+@MainActor
+private func activateLauncher() {
+    if #available(macOS 14.0, *) {
+        NSApplication.shared.activate()
+    } else {
+        NSApplication.shared.activate(ignoringOtherApps: true)
+    }
+}
+
+private final class BootWindow: NSWindow {
+    override var canBecomeKey: Bool { true }
+    override var canBecomeMain: Bool { true }
+}
+
 private enum LauncherError: LocalizedError {
     case missingConfig
     case missingVideo(URL)
@@ -185,7 +199,7 @@ private final class BootController: NSObject, NSWindowDelegate {
             )
         }
 
-        let playerWindow = NSWindow(
+        let playerWindow = BootWindow(
             contentRect: frame,
             styleMask: [.borderless],
             backing: .buffered,
@@ -249,7 +263,7 @@ private final class BootController: NSObject, NSWindowDelegate {
 
         playerWindow.contentView = rootView
         playerWindow.makeKeyAndOrderFront(nil)
-        app.activate()
+        activateLauncher()
         installEscapeMonitor()
         if let targetApplication {
             revealTargetBehindOverlay(targetApplication)
@@ -313,8 +327,8 @@ private final class BootController: NSObject, NSWindowDelegate {
         app.unhide()
         _ = app.activate(options: [.activateAllWindows])
         // Keep the animation in front and keep Esc available while Codex opens underneath it.
-        window?.orderFrontRegardless()
-        NSApplication.shared.activate()
+        window?.makeKeyAndOrderFront(nil)
+        activateLauncher()
     }
 
     private func runningTargetApplication() -> NSRunningApplication? {
@@ -380,6 +394,9 @@ private final class BootController: NSObject, NSWindowDelegate {
     private func showPlaybackFailure(_ error: Error?) {
         guard !handedOff else { return }
         player?.pause()
+        // A normal modal alert must not sit underneath the screen-saver-level video.
+        window?.orderOut(nil)
+        activateLauncher()
         let alert = NSAlert()
         alert.alertStyle = .warning
         alert.messageText = "启动动画或 Codex 启动失败"
