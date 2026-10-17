@@ -17,7 +17,7 @@ xcrun swiftc -swift-version 5 -target "$(uname -m)-apple-macosx13.0" \
 
 plutil -lint "$app/Contents/Info.plist"
 test "$(/usr/libexec/PlistBuddy -c 'Print CFBundleExecutable' "$app/Contents/Info.plist")" = DragonCodexBoot
-lipo -verify_arch arm64 "$app/Contents/MacOS/DragonCodexBoot"
+lipo "$app/Contents/MacOS/DragonCodexBoot" -verify_arch arm64
 cmp "$repo_root/media/startup.mp4" "$app/Contents/Resources/startup.mp4"
 for notice in LICENSE THIRD_PARTY_NOTICES.md MEDIA_NOTICE.md; do
   test -s "$app/Contents/Resources/Licenses/$notice"
