@@ -273,7 +273,7 @@ private final class BootController: NSObject, NSWindowDelegate {
         beginPlayback(in: videoView)
         startedAt = Date()
         let playbackTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 30.0, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.tick() }
+            Task { @MainActor [weak self] in self?.tick() }
         }
         timer = playbackTimer
         RunLoop.main.add(playbackTimer, forMode: .common)
@@ -292,12 +292,12 @@ private final class BootController: NSObject, NSWindowDelegate {
             object: item,
             queue: .main
         ) { [weak self] _ in
-            Task { @MainActor in self?.handOff() }
+            Task { @MainActor [weak self] in self?.handOff() }
         }
         statusObservation = item.observe(\.status, options: [.initial, .new]) { [weak self] item, _ in
             guard item.status == .failed else { return }
             let error = item.error
-            Task { @MainActor in self?.showPlaybackFailure(error) }
+            Task { @MainActor [weak self] in self?.showPlaybackFailure(error) }
         }
         mediaPlayer.play()
     }
@@ -544,7 +544,7 @@ private final class CodexLaunchMonitor {
             guard let application = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication else {
                 return
             }
-            Task { @MainActor in self?.applicationDidLaunch(application) }
+            Task { @MainActor [weak self] in self?.applicationDidLaunch(application) }
         }
         NSLog("Dragon Codex Boot is watching for %@ launches", targetBundleIdentifier)
     }
@@ -561,7 +561,7 @@ private final class CodexLaunchMonitor {
         stableFrameCount = 0
         windowPollTimer?.invalidate()
         let timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.pollForWindow() }
+            Task { @MainActor [weak self] in self?.pollForWindow() }
         }
         windowPollTimer = timer
         RunLoop.main.add(timer, forMode: .common)
